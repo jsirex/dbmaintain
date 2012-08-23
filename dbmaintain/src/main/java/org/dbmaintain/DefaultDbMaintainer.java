@@ -208,6 +208,11 @@ public class DefaultDbMaintainer implements DbMaintainer {
                 }
             }
 
+            if (!dryRun) {
+            	logger.info("Executing preprocessing scripts.");
+            	executePreprocessingScripts();
+            }
+
             if (recreateFromScratch) {
                 if (baseLineRevision != null) {
                     throw new DbMaintainException("Unable to recreate the database from scratch: a baseline revision is set.\n" +
@@ -293,6 +298,14 @@ public class DefaultDbMaintainer implements DbMaintainer {
         return executedScriptInfoSource.getExecutedScripts().size() == 0 && scriptRepository.areScriptsAvailable();
     }
 
+    /**
+     * Executes all preprocessing scripts
+     */
+    protected void executePreprocessingScripts() {
+    	// TODO: preprocessing
+        executedScriptInfoSource.deleteAllExecutedPreprocessingScripts();
+        executeScripts(scriptRepository.getPreProcessingScripts());
+	}
 
     /**
      * Executes all postprocessing scripts
@@ -458,7 +471,7 @@ public class DefaultDbMaintainer implements DbMaintainer {
     }
 
     protected String getErrorScriptOptionsMessage(Script script) {
-        if (script.isRepeatable() || script.isPostProcessingScript()) {
+        if (script.isRepeatable() || script.isPostProcessingScript() || script.isPreProcessingScript()) {
             return "Please verify the state of the database and fix the script.\n" +
                     "You can then continue the update by re-running the updateDatabase task. The error script will then be executed again.";
         }

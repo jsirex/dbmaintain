@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ScriptFactoryIsPostProcessingScriptTest {
+public class ScriptFactoryIsPreProcessingScriptTest {
 
     private String scriptIndexRegexp;
     private String targetDatabaseRegexp;
@@ -45,55 +45,55 @@ public class ScriptFactoryIsPostProcessingScriptTest {
 
 
     @Test
-    public void postProcessingScript() {
-        ScriptFactory scriptFactory = createScriptFactory("postprocessing");
+    public void preProcessingScript() {
+        ScriptFactory scriptFactory = createScriptFactory("preprocessing");
 
-        Script script = scriptFactory.createScriptWithoutContent("postprocessing/01_my_script.sql", null, null);
-        assertTrue(script.isPostProcessingScript());
+        Script script = scriptFactory.createScriptWithoutContent("preprocessing/01_my_script.sql", null, null);
+        assertTrue(script.isPreProcessingScript());
     }
 
     @Test
-    public void notAPostProcessingScript() {
-        ScriptFactory scriptFactory = createScriptFactory("postprocessing");
+    public void notAPreProcessingScript() {
+        ScriptFactory scriptFactory = createScriptFactory("preprocessing");
 
         Script script = scriptFactory.createScriptWithoutContent("other/01_my_script.sql", null, null);
-        assertFalse(script.isPostProcessingScript());
+        assertFalse(script.isPreProcessingScript());
     }
 
     @Test
-    public void noPostProcessingScriptDirConfigured() {
+    public void noPreProcessingScriptDirConfigured() {
         ScriptFactory scriptFactory = createScriptFactory(null);
 
-        Script script = scriptFactory.createScriptWithoutContent("postprocessing/01_my_script.sql", null, null);
-        assertFalse(script.isPostProcessingScript());
+        Script script = scriptFactory.createScriptWithoutContent("preprocessing/01_my_script.sql", null, null);
+        assertFalse(script.isPreProcessingScript());
     }
 
     @Test
-    public void postProcessingScriptDirEndingWithSlash() {
-        ScriptFactory scriptFactory = createScriptFactory("postprocessing/");
+    public void preProcessingScriptDirEndingWithSlash() {
+        ScriptFactory scriptFactory = createScriptFactory("preprocessing/");
 
-        Script script = scriptFactory.createScriptWithoutContent("postprocessing/01_my_script.sql", null, null);
-        assertTrue(script.isPostProcessingScript());
+        Script script = scriptFactory.createScriptWithoutContent("preprocessing/01_my_script.sql", null, null);
+        assertTrue(script.isPreProcessingScript());
     }
 
     @Test
-    public void postProcessingScriptDirEndingWithBackslash() {
-        ScriptFactory scriptFactory = createScriptFactory("postprocessing\\");
+    public void preProcessingScriptDirEndingWithBackslash() {
+        ScriptFactory scriptFactory = createScriptFactory("preprocessing\\");
 
-        Script script = scriptFactory.createScriptWithoutContent("postprocessing/01_my_script.sql", null, null);
-        assertTrue(script.isPostProcessingScript());
+        Script script = scriptFactory.createScriptWithoutContent("preprocessing/01_my_script.sql", null, null);
+        assertTrue(script.isPreProcessingScript());
     }
 
     @Test
     public void scriptNameWithBackslashes() {
-        ScriptFactory scriptFactory = createScriptFactory("postprocessing");
+        ScriptFactory scriptFactory = createScriptFactory("preprocessing");
 
-        Script script = scriptFactory.createScriptWithoutContent("postprocessing\\01_my_script.sql", null, null);
-        assertTrue(script.isPostProcessingScript());
+        Script script = scriptFactory.createScriptWithoutContent("preprocessing\\01_my_script.sql", null, null);
+        assertTrue(script.isPreProcessingScript());
     }
 
 
-    private ScriptFactory createScriptFactory(String postProcessingScriptDirName) {
-        return new ScriptFactory(scriptIndexRegexp, targetDatabaseRegexp, qualifierRegexp, null, null, null, postProcessingScriptDirName, null);
+    private ScriptFactory createScriptFactory(String preProcessingScriptDirName) {
+        return new ScriptFactory(scriptIndexRegexp, targetDatabaseRegexp, qualifierRegexp, null, null, preProcessingScriptDirName, null, null);
     }
 }

@@ -30,16 +30,18 @@ public class ScriptUpdates {
     private SortedSet<ScriptUpdate> irregularScriptUpdates;
     private SortedSet<ScriptUpdate> regularlyDeletedRepeatableScripts;
     private SortedSet<ScriptUpdate> regularlyAddedPatchScripts;
+    private SortedSet<ScriptUpdate> regularPreprocessingScriptUpdates;
     private SortedSet<ScriptUpdate> regularPostprocessingScriptUpdates;
     private SortedSet<ScriptUpdate> regularlyRenamedScripts;
 
     protected ScriptUpdates(SortedSet<ScriptUpdate> regularlyAddedOrModifiedScripts, SortedSet<ScriptUpdate> irregularScriptUpdates,
-                            SortedSet<ScriptUpdate> regularlyDeletedRepeatableScripts, SortedSet<ScriptUpdate> regularlyAddedPatchScripts,
+                            SortedSet<ScriptUpdate> regularlyDeletedRepeatableScripts, SortedSet<ScriptUpdate> regularlyAddedPatchScripts, SortedSet<ScriptUpdate> regularPreprocessingScriptUpdates,
                             SortedSet<ScriptUpdate> regularPostprocessingScriptUpdates, SortedSet<ScriptUpdate> regularlyRenamedScripts) {
         this.regularlyAddedOrModifiedScripts = regularlyAddedOrModifiedScripts;
         this.irregularScriptUpdates = irregularScriptUpdates;
         this.regularlyDeletedRepeatableScripts = regularlyDeletedRepeatableScripts;
         this.regularlyAddedPatchScripts = regularlyAddedPatchScripts;
+        this.regularPreprocessingScriptUpdates = regularPreprocessingScriptUpdates;
         this.regularPostprocessingScriptUpdates = regularPostprocessingScriptUpdates;
         this.regularlyRenamedScripts = regularlyRenamedScripts;
     }
@@ -70,6 +72,10 @@ public class ScriptUpdates {
     }
 
 
+    public SortedSet<ScriptUpdate> getRegularPreprocessingScriptUpdates() {
+    	return regularPreprocessingScriptUpdates;
+    }
+
     public SortedSet<ScriptUpdate> getRegularPostprocessingScriptUpdates() {
         return regularPostprocessingScriptUpdates;
     }
@@ -77,7 +83,7 @@ public class ScriptUpdates {
 
     public SortedSet<ScriptUpdate> getRegularScriptUpdates() {
         return unionSortedSet(regularlyAddedOrModifiedScripts, regularlyAddedPatchScripts, regularlyRenamedScripts,
-                regularlyDeletedRepeatableScripts, regularPostprocessingScriptUpdates);
+                regularlyDeletedRepeatableScripts, regularPreprocessingScriptUpdates, regularPostprocessingScriptUpdates);
     }
 
 
@@ -88,12 +94,12 @@ public class ScriptUpdates {
 
     public boolean noUpdatesOtherThanRepeatableScriptDeletionsOrRenames() {
         return regularlyAddedOrModifiedScripts.size() == 0 && irregularScriptUpdates.size() == 0 &&
-                regularlyAddedPatchScripts.size() == 0 && regularPostprocessingScriptUpdates.size() == 0;
+                regularlyAddedPatchScripts.size() == 0 && regularPreprocessingScriptUpdates.size() == 0 && regularPostprocessingScriptUpdates.size() == 0;
     }
 
     public boolean isEmpty() {
         return regularlyAddedOrModifiedScripts.size() == 0 && irregularScriptUpdates.size() == 0 &&
-                regularlyAddedPatchScripts.size() == 0 && regularPostprocessingScriptUpdates.size() == 0 &&
+                regularlyAddedPatchScripts.size() == 0 && regularPostprocessingScriptUpdates.size() == 0 && regularPreprocessingScriptUpdates.size() == 0 &&
                 regularlyRenamedScripts.size() == 0 && regularlyDeletedRepeatableScripts.size() == 0;
     }
 
@@ -104,6 +110,7 @@ public class ScriptUpdates {
                 (!irregularScriptUpdates.isEmpty() ? ", irregularScriptUpdates=" + irregularScriptUpdates : "") +
                 (!regularlyDeletedRepeatableScripts.isEmpty() ? ", regularlyDeletedRepeatableScripts=" + regularlyDeletedRepeatableScripts : "") +
                 (!regularlyAddedPatchScripts.isEmpty() ? ", regularlyAddedPatchScripts=" + regularlyAddedPatchScripts : "") +
+                (!regularPreprocessingScriptUpdates.isEmpty() ? ", regularPreprocessingScriptUpdates=" + regularPreprocessingScriptUpdates : "") +
                 (!regularPostprocessingScriptUpdates.isEmpty() ? ", regularPostprocessingScriptUpdates=" + regularPostprocessingScriptUpdates : "") +
                 (!regularlyRenamedScripts.isEmpty() ? ", regularlyRenamedScripts=" + regularlyRenamedScripts : "") +
                 '}';

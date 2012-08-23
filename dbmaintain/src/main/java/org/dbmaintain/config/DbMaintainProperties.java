@@ -211,6 +211,11 @@ public class DbMaintainProperties {
     /**
      * Property key for the directory in which the code script files are located
      */
+    public static final String PROPERTY_PREPROCESSINGSCRIPT_DIRNAME = "dbMaintainer.preProcessingScript.directoryName";
+
+    /**
+     * Property key for the directory in which the code script files are located
+     */
     public static final String PROPERTY_POSTPROCESSINGSCRIPT_DIRNAME = "dbMaintainer.postProcessingScript.directoryName";
 
     /**
