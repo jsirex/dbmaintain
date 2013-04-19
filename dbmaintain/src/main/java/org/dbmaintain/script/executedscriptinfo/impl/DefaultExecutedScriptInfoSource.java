@@ -308,8 +308,10 @@ public class DefaultExecutedScriptInfoSource implements ExecutedScriptInfoSource
         checkExecutedScriptsTable();
 
         String deleteSql = "delete from " + getQualifiedExecutedScriptsTableName() + " where " + succeededColumnName + "=0";
-        sqlHandler.executeUpdateAndCommit(deleteSql, defaultDatabase.getDataSource());
-
+        int result = sqlHandler.executeUpdateAndCommit(deleteSql, defaultDatabase.getDataSource());
+        if(result > 0){
+            logger.info("Removing unsuccessfull scripts before updating database: removed " + result);
+        }
         resetCachedState();
     }
 
