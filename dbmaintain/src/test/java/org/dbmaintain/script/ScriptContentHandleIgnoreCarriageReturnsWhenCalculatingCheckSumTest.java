@@ -70,7 +70,8 @@ public class ScriptContentHandleIgnoreCarriageReturnsWhenCalculatingCheckSumTest
         String unixCheckSum = unixScriptContentHandle.getCheckSum();
         String windowsCheckSum = windowsScriptContentHandle.getCheckSum();
 
-        assertEquals("Scripts should not be converted to UNIX if useUnixCheckSum is false", windowsCheckSum, unixCheckSum);
+        // What? assertEquals("Scripts should not be converted to UNIX if useUnixCheckSum is false", windowsCheckSum, unixCheckSum);
+        assertFalse("Scripts should not be converted to UNIX if useUnixCheckSum is false", windowsCheckSum.equals(unixCheckSum));
     }
 
 
