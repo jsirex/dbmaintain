@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import org.dbmaintain.script.ExecutedScript;
 import org.dbmaintain.script.InvalidObject;

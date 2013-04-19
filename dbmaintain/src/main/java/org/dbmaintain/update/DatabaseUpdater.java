@@ -1,5 +1,6 @@
 package org.dbmaintain.update;
 
+import org.apache.log4j.Logger;
 import org.dbmaintain.DbMaintainer;
 import org.dbmaintain.MainFactory;
 import org.dbmaintain.script.executedscriptinfo.DatabaseStatusInfoSource;
@@ -7,8 +8,7 @@ import org.dbmaintain.script.executedscriptinfo.ExecutedScriptInfoSource;
 import org.dbmaintain.util.DbMaintainException;
 
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,8 +48,8 @@ public class DatabaseUpdater {
             executedScriptInfoSource.removeErrorScripts();
             dbMaintainer.updateDatabase(dryRun);
         } catch (DbMaintainException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            logger.warning("Unsuccessfull scripts will been removed now!\n"
+            logger.error(ex);
+            logger.error("Unsuccessfull scripts will been removed now!\n"
                     + "# Stop Application\n"
                     + "# Fix failed scripts or database errors\n"
                     + "# Start Application again");

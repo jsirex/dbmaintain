@@ -97,6 +97,11 @@ public class ScriptUpdates {
                 regularlyAddedPatchScripts.size() == 0 && regularPreprocessingScriptUpdates.size() == 0 && regularPostprocessingScriptUpdates.size() == 0;
     }
 
+    public boolean isDatabaseMigrationNeeded() {
+        return regularlyAddedOrModifiedScripts.size() > 0 || irregularScriptUpdates.size() > 0 ||
+                regularlyAddedPatchScripts.size() > 0 || regularlyRenamedScripts.size() > 0;
+    }
+
     public boolean isEmpty() {
         return regularlyAddedOrModifiedScripts.size() == 0 && irregularScriptUpdates.size() == 0 &&
                 regularlyAddedPatchScripts.size() == 0 && regularPostprocessingScriptUpdates.size() == 0 && regularPreprocessingScriptUpdates.size() == 0 &&

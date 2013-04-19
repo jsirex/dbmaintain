@@ -208,11 +208,6 @@ public class DefaultDbMaintainer implements DbMaintainer {
                 }
             }
 
-            if (!dryRun) {
-            	logger.info("Executing preprocessing scripts.");
-            	executePreprocessingScripts();
-            }
-
             if (recreateFromScratch) {
                 if (baseLineRevision != null) {
                     throw new DbMaintainException("Unable to recreate the database from scratch: a baseline revision is set.\n" +
@@ -226,8 +221,10 @@ public class DefaultDbMaintainer implements DbMaintainer {
                     executedScriptInfoSource.resetCachedState();
                     executeScripts(scriptRepository.getAllUpdateScripts());
                 }
-            } else {
+            } else if (scriptUpdates.isDatabaseMigrationNeeded()) {
                 logger.info("The database is updated incrementally, since following regular script updates were detected:\n" + scriptUpdatesFormatter.formatScriptUpdates(scriptUpdates.getRegularScriptUpdates()));
+                logger.info("Executing preprocessing scripts.");
+
                 if (!dryRun) {
                     // If the disable constraints option is enabled, disable all FK and not null constraints
                     if (disableConstraints) {
@@ -237,39 +234,45 @@ public class DefaultDbMaintainer implements DbMaintainer {
                     if (cleanDb) {
                         dbCleaner.cleanDatabase();
                     }
+
+                    executePreprocessingScripts();
                     // If there are incremental patch scripts with a lower index and the option allowOutOfSequenceExecutionOfPatches
                     // is enabled, execute them first
                     executeScriptUpdates(scriptUpdates.getRegularlyAddedPatchScripts());
+
                     // Execute all new incremental and all new or modified repeatable scripts
                     executeScriptUpdates(scriptUpdates.getRegularlyAddedOrModifiedScripts());
-                    // If repeatable scripts were removed, also remove them from the executed scripts
-                    removeDeletedRepeatableScriptsFromExecutedScripts(scriptUpdates.getRegularlyDeletedRepeatableScripts());
+
                     // If regular script renames were detected, update the executed script records to reflect this
                     performRegularScriptRenamesInExecutedScripts(scriptUpdates.getRegularlyRenamedScripts());
+
+                    // Execute all post processing scripts
+                    executePostprocessingScripts();
+
+                    // If the disable constraints option is enabled, disable all FK and not null constraints
+                    if (disableConstraints) {
+                        constraintsDisabler.disableConstraints();
+                    }
+                    // the scripts could have added data, if cleandb is enabled, remove all data from the database.
+                    if (cleanDb) {
+                        dbCleaner.cleanDatabase();
+                    }
+                    // If the update sequences option is enabled, update all sequences to have a value equal to or higher than the configured threshold
+                    if (updateSequences) {
+                        sequenceUpdater.updateSequences();
+                    }
                 }
-            }
-            if (scriptUpdates.noUpdatesOtherThanRepeatableScriptDeletionsOrRenames()) {
-                logger.info("No script updates were detected, except for repeatable script deletions and script renames. Therefore, actions such as the execution of postprocessing scripts and disabling the constraints are skipped.");
-                return false;
+                logger.info("The database has been updated successfully.");
             }
 
             if (!dryRun) {
-                // Execute all post processing scripts
-                executePostprocessingScripts();
+                // If repeatable scripts were removed, also remove them from the executed scripts
+                removeDeletedRepeatableScriptsFromExecutedScripts(scriptUpdates.getRegularlyDeletedRepeatableScripts());
+            }
 
-                // If the disable constraints option is enabled, disable all FK and not null constraints
-                if (disableConstraints) {
-                    constraintsDisabler.disableConstraints();
-                }
-                // the scripts could have added data, if cleandb is enabled, remove all data from the database.
-                if (cleanDb) {
-                    dbCleaner.cleanDatabase();
-                }
-                // If the update sequences option is enabled, update all sequences to have a value equal to or higher than the configured threshold
-                if (updateSequences) {
-                    sequenceUpdater.updateSequences();
-                }
-                logger.info("The database has been updated successfully.");
+            if (scriptUpdates.noUpdatesOtherThanRepeatableScriptDeletionsOrRenames()) {
+                logger.info("No script updates were detected, except for repeatable script deletions and script renames. Therefore, actions such as the execution of postprocessing scripts and disabling the constraints are skipped.");
+                return false;
             }
             return true;
 

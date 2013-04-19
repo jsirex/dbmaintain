@@ -506,46 +506,46 @@ public class DbMaintainIntegrationTest {
     public void reExecuteAllPreProcessingScriptsIfOneOfThemIsModified() {
     	disableFromScratch();
     	createScripts(INCREMENTAL_1);
+        createScripts(REPEATABLE);
     	createPreprocessingScripts(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_NOTINDEXED);
     	updateDatabase();
     	assertScriptsCorrectlyExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_NOTINDEXED);
 
-    	// Verify that all preprocessing scripts are re-executed if a new one is added
-    	dropTestTables(defaultDatabase, getTableNameForScript(PRE_PROCESSING_INDEXED_1));
+    	// Verify that all preprocessing scripts are not re-executed if a new one is added
+    	dropTestTables(defaultDatabase, getTableNameForScript(PRE_PROCESSING_INDEXED_1),
+                getTableNameForScript(PRE_PROCESSING_NOTINDEXED), getTableNameForScript(REPEATABLE));
+
     	createScripts(PRE_PROCESSING_INDEXED_2);
     	updateDatabase();
-    	assertScriptsCorrectlyExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2, PRE_PROCESSING_NOTINDEXED);
+    	assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2, PRE_PROCESSING_NOTINDEXED);
 
-    	// Verify that all preprocessing scripts are re-executed if a not indexed preprocessing script is updated
-    	dropTestTables(defaultDatabase, getTableNameForScript(PRE_PROCESSING_INDEXED_1));
+    	// Verify that all preprocessing scripts are not re-executed if a not indexed preprocessing script is updated
     	updateRepeatableScript(PRE_PROCESSING_NOTINDEXED);
     	updateDatabase();
-    	assertScriptsCorrectlyExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2);
-    	assertUpdatedScriptsExecuted(PRE_PROCESSING_NOTINDEXED);
+        assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2, PRE_PROCESSING_NOTINDEXED);
 
-    	// Verify that all preprocessing scripts are re-executed if an indexed preprocessing script is updated
-    	dropTestTables(defaultDatabase, getUpdatedTableNameForScript(PRE_PROCESSING_NOTINDEXED));
+    	// Verify that all preprocessing scripts are not re-executed if an indexed preprocessing script is updated
     	updateRepeatableScript(PRE_PROCESSING_INDEXED_1);
     	updateDatabase();
-    	assertUpdatedScriptsExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_NOTINDEXED);
+        assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2, PRE_PROCESSING_NOTINDEXED);
 
-    	// Verify that all preprocessing scripts are re-executed if one of them is renamed
-    	dropTestTables(defaultDatabase, getUpdatedTableNameForScript(PRE_PROCESSING_INDEXED_1),
-    			getTableNameForScript(PRE_PROCESSING_INDEXED_2), getUpdatedTableNameForScript(PRE_PROCESSING_NOTINDEXED));
+    	// Verify that all preprocessing scripts are not re-executed if one of them is renamed
     	renameScript(PRE_PROCESSING_INDEXED_2, PRE_PROCESSING_INDEXED_2_RENAMED);
     	updateDatabase();
-    	assertScriptsCorrectlyExecuted(PRE_PROCESSING_INDEXED_2);
-    	assertUpdatedScriptsExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_NOTINDEXED);
-    	assertNotInExecutedScripts(PRE_PROCESSING_INDEXED_2);
+        assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2,
+                PRE_PROCESSING_NOTINDEXED, PRE_PROCESSING_INDEXED_2_RENAMED);
 
-    	// Verify that all preprocessing scripts are re-executed if one of them is deleted
-    	dropTestTables(defaultDatabase, getUpdatedTableNameForScript(PRE_PROCESSING_INDEXED_1),
-    			getTableNameForScript(PRE_PROCESSING_INDEXED_2), getUpdatedTableNameForScript(PRE_PROCESSING_NOTINDEXED));
+    	// Verify that all preprocessing scripts are not re-executed if one of them is deleted
     	removeScript(PRE_PROCESSING_INDEXED_2_RENAMED);
     	updateDatabase();
-    	assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_2);
-    	assertUpdatedScriptsExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_NOTINDEXED);
-    	assertNotInExecutedScripts(PRE_PROCESSING_INDEXED_2);
+        assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2,
+                PRE_PROCESSING_NOTINDEXED, PRE_PROCESSING_INDEXED_2_RENAMED);
+
+        // Verify that all preprocessing scripts are not re-executed if one of repeatable scripts is deleted
+        removeScript(REPEATABLE);
+        updateDatabase();
+        assertScriptsNotExecuted(PRE_PROCESSING_INDEXED_1, PRE_PROCESSING_INDEXED_2,
+                PRE_PROCESSING_NOTINDEXED, PRE_PROCESSING_INDEXED_2_RENAMED);
     }
 
     @Test
@@ -590,46 +590,45 @@ public class DbMaintainIntegrationTest {
     public void reExecuteAllPostProcessingScriptsIfOneOfThemIsModified() {
         disableFromScratch();
         createScripts(INCREMENTAL_1);
+        createScripts(REPEATABLE);
         createPostprocessingScripts(POST_PROCESSING_INDEXED_1, POST_PROCESSING_NOTINDEXED);
         updateDatabase();
         assertScriptsCorrectlyExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_NOTINDEXED);
 
-        // Verify that all postprocessing scripts are re-executed if a new one is added
-        dropTestTables(defaultDatabase, getTableNameForScript(POST_PROCESSING_INDEXED_1));
+        // Verify that all postprocessing scripts are not re-executed if a new one is added
+        dropTestTables(defaultDatabase, getTableNameForScript(POST_PROCESSING_INDEXED_1),
+                getTableNameForScript(POST_PROCESSING_NOTINDEXED));
         createScripts(POST_PROCESSING_INDEXED_2);
         updateDatabase();
-        assertScriptsCorrectlyExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2, POST_PROCESSING_NOTINDEXED);
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2, POST_PROCESSING_NOTINDEXED);
 
-        // Verify that all postprocessing scripts are re-executed if a not indexed postprocessing script is updated
-        dropTestTables(defaultDatabase, getTableNameForScript(POST_PROCESSING_INDEXED_1));
+        // Verify that all postprocessing scripts are not re-executed if a not indexed postprocessing script is updated
         updateRepeatableScript(POST_PROCESSING_NOTINDEXED);
         updateDatabase();
-        assertScriptsCorrectlyExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2);
-        assertUpdatedScriptsExecuted(POST_PROCESSING_NOTINDEXED);
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2, POST_PROCESSING_NOTINDEXED);
 
-        // Verify that all postprocessing scripts are re-executed if an indexed postprocessing script is updated
-        dropTestTables(defaultDatabase, getUpdatedTableNameForScript(POST_PROCESSING_NOTINDEXED));
+        // Verify that all postprocessing scripts are not re-executed if an indexed postprocessing script is updated
         updateRepeatableScript(POST_PROCESSING_INDEXED_1);
         updateDatabase();
-        assertUpdatedScriptsExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_NOTINDEXED);
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2, POST_PROCESSING_NOTINDEXED);
 
-        // Verify that all postprocessing scripts are re-executed if one of them is renamed
-        dropTestTables(defaultDatabase, getUpdatedTableNameForScript(POST_PROCESSING_INDEXED_1),
-                getTableNameForScript(POST_PROCESSING_INDEXED_2), getUpdatedTableNameForScript(POST_PROCESSING_NOTINDEXED));
+        // Verify that all postprocessing scripts are not re-executed if one of them is renamed
         renameScript(POST_PROCESSING_INDEXED_2, POST_PROCESSING_INDEXED_2_RENAMED);
         updateDatabase();
-        assertScriptsCorrectlyExecuted(POST_PROCESSING_INDEXED_2);
-        assertUpdatedScriptsExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_NOTINDEXED);
-        assertNotInExecutedScripts(POST_PROCESSING_INDEXED_2);
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2,
+                POST_PROCESSING_NOTINDEXED, POST_PROCESSING_INDEXED_2_RENAMED);
 
-        // Verify that all postprocessing scripts are re-executed if one of them is deleted
-        dropTestTables(defaultDatabase, getUpdatedTableNameForScript(POST_PROCESSING_INDEXED_1),
-                getTableNameForScript(POST_PROCESSING_INDEXED_2), getUpdatedTableNameForScript(POST_PROCESSING_NOTINDEXED));
+        // Verify that all postprocessing scripts are not re-executed if one of them is deleted
         removeScript(POST_PROCESSING_INDEXED_2_RENAMED);
         updateDatabase();
-        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_2);
-        assertUpdatedScriptsExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_NOTINDEXED);
-        assertNotInExecutedScripts(POST_PROCESSING_INDEXED_2);
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2,
+                POST_PROCESSING_NOTINDEXED, POST_PROCESSING_INDEXED_2_RENAMED);
+
+        // Verify that all postprocessing scripts are not re-executed if one of repeatable scripts is deleted
+        removeScript(REPEATABLE);
+        updateDatabase();
+        assertScriptsNotExecuted(POST_PROCESSING_INDEXED_1, POST_PROCESSING_INDEXED_2,
+                POST_PROCESSING_NOTINDEXED, POST_PROCESSING_INDEXED_2_RENAMED);
     }
 
     @Test
