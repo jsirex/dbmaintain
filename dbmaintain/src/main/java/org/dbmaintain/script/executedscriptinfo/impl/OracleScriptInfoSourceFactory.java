@@ -62,7 +62,7 @@ public class OracleScriptInfoSourceFactory extends FactoryWithDatabase<ExecutedS
         ScriptIndexes baselineRevision = factoryWithDatabaseContext.getBaselineRevision();
 
         ScriptFactory scriptFactory = new ScriptFactory(scriptIndexRegexp, targetDatabaseRegexp, qualifierRegexp, registeredQualifiers, patchQualifiers, preProcessingScriptsDirName, postProcessingScriptsDirName, baselineRevision);
-        return new DefaultExecutedScriptInfoSource(autoCreateExecutedScriptsTable, executedScriptsTableName, fileNameColumnName, fileNameColumnSize,
+        return new OracleDatabaseStatusInfoSource(autoCreateExecutedScriptsTable, executedScriptsTableName, fileNameColumnName, fileNameColumnSize,
                 fileLastModifiedAtColumnName, checksumColumnName, checksumColumnSize,
                 executedAtColumnName, executedAtColumnSize, succeededColumnName, timestampFormat, defaultDatabase,
                 getSqlHandler(), scriptFactory);
